@@ -21,11 +21,17 @@ event log_post_bodies(f: fa_file, data: string)
 		if ( ! c$http?$post_body )
 			c$http$post_body = "";
 
+		# If we are already above the captured size here, just return.
+		if ( |c$http$post_body| > http_post_body_length )
+			return;
+
 		c$http$post_body = c$http$post_body + data;
 		if ( |c$http$post_body| > http_post_body_length )
 			{
 			c$http$post_body = c$http$post_body[0:http_post_body_length] + "...";
-			Files::remove_analyzer(f, Files::ANALYZER_DATA_EVENT, [$stream_event=log_post_bodies]);
+			# This is currently failing on Corelight Sensors to due to restrictions so 
+			# we will work around it for now.
+			#Files::remove_analyzer(f, Files::ANALYZER_DATA_EVENT, [$stream_event=log_post_bodies]);
 			}
 		}
 	}
