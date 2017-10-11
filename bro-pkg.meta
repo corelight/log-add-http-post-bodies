@@ -1,5 +1,5 @@
 [package]
-description = Find and log long-lived connections into a "conn_long" log.
-tags = conn
+description = Add a POST body excerpt into the HTTP log
+tags = http log extend
 version = 1.0.0
 script_dir = scripts
