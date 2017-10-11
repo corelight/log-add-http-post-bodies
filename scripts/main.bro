@@ -22,9 +22,9 @@ event log_post_bodies(f: fa_file, data: string)
 			c$http$post_body = "";
 
 		c$http$post_body = c$http$post_body + data;
-		if ( |c$http$post_body| > extract_length )
+		if ( |c$http$post_body| > http_post_body_length )
 			{
-			c$http$post_body = c$http$post_body[0:extract_length] + "...";
+			c$http$post_body = c$http$post_body[0:http_post_body_length] + "...";
 			Files::remove_analyzer(f, Files::ANALYZER_DATA_EVENT, [$stream_event=log_post_bodies]);
 			}
 		}
