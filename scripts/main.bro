@@ -6,7 +6,7 @@ module Corelight;
 
 export {
 	## The length of POST bodies to extract.
-	const http_post_body_length = 100 &redef;
+	const http_post_body_length = 200 &redef;
 }
 
 redef record HTTP::Info += {
