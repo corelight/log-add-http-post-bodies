@@ -9,8 +9,8 @@ Installation
 
 ::
 
-  bro-pkg refresh
-  bro-pkg install corelight/log-add-http-post-bodies
+  zkg refresh
+  zkg install corelight/log-add-http-post-bodies
 
 Usage
 -----
