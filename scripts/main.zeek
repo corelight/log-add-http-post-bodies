@@ -5,7 +5,8 @@
 module Corelight;
 
 export {
-	## The length of POST bodies to extract.
+	## The maximum amount of bytes from HTTP POST bodies that get captured in
+	## the log.
 	const http_post_body_length = 200 &redef;
 }
 
