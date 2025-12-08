@@ -1,5 +1,5 @@
 [package]
 description = Add a POST body excerpt into the HTTP log.
 tags = http log extend
-version = 1.0.0
+version = 1.0.1
 script_dir = scripts
