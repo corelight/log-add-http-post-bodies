@@ -42,7 +42,7 @@ event log_post_bodies(f: fa_file, data: string)
 
 event file_over_new_connection(f: fa_file, c: connection, is_orig: bool)
 	{
-	if ( ! is_orig || ! c?$http || ! c$http?$method )
+	if ( ! is_orig || ! c?$http || ! c$http?$method || c$http$method != "POST" )
 		return;
 
 	Files::add_analyzer(f, Files::ANALYZER_DATA_EVENT, log_event);
