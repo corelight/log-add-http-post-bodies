@@ -1,45 +1,49 @@
 ##! Add an excerpt of HTTP POST bodies into the HTTP log.
 
-@load base/protocols/http
-
 module Corelight;
 
 export {
 	## The length of POST bodies to extract.
-	const http_post_body_length = 200 &redef;
+	option http_post_body_length = 200;
 }
 
 redef record HTTP::Info += {
 	post_body: string &log &optional;
 };
 
+global log_post_bodies: event(f: fa_file, data: string);
+const log_event = Files::AnalyzerArgs($stream_event=log_post_bodies);
+
 event log_post_bodies(f: fa_file, data: string)
 	{
-	for ( cid in f$conns )
+	for ( _, c in f$conns )
 		{
-		local c: connection = f$conns[cid];
-		if ( ! c$http?$post_body )
-			c$http$post_body = "";
+		local http = c$http;
 
-		# If we are already above the captured size here, just return.
-		if ( |c$http$post_body| > http_post_body_length )
-			return;
-
-		c$http$post_body = c$http$post_body + data;
-		if ( |c$http$post_body| > http_post_body_length )
+		if ( http?$post_body )
 			{
-			c$http$post_body = c$http$post_body[0:http_post_body_length] + "...";
-			# This is currently failing on Corelight Sensors to due to restrictions so 
-			# we will work around it for now.
-			#Files::remove_analyzer(f, Files::ANALYZER_DATA_EVENT, [$stream_event=log_post_bodies]);
+			if ( |http$post_body| > http_post_body_length )
+				return; # already above the maximum size
+			http$post_body += data;
 			}
+		else
+			http$post_body = data;
+
+		if ( |http$post_body| <= http_post_body_length )
+			next; # keep accruing
+
+		# Finalize.
+		http$post_body =
+			http$post_body[0:http_post_body_length] + "...";
+
+		Files::remove_analyzer(f, Files::ANALYZER_DATA_EVENT, log_event);
 		}
 	}
 
 event file_over_new_connection(f: fa_file, c: connection, is_orig: bool)
 	{
-	if ( is_orig && c?$http && c$http?$method && c$http$method == "POST" )
-		{
-		Files::add_analyzer(f, Files::ANALYZER_DATA_EVENT, [$stream_event=log_post_bodies]);
-		}
+	if ( ! is_orig || ! c?$http || ! c$http?$method || c$http$method != "POST" )
+		return;
+
+	Files::add_analyzer(f, Files::ANALYZER_DATA_EVENT, log_event);
 	}
